@@ -6,11 +6,16 @@
 #include <cmath>
 #include <cstring>
 
+#include "opsys.h"
 
 
-double nextExp(double lambda)
+double nextExp(double lambda, int ceil)
 {
-    return -log(drand48()) / lambda;
+    while (true)
+    {
+        double x = -log(drand48()) / lambda;
+        if (x < ceil) return x;
+    }
 }
 
 int main(int argc, char* argv[])
@@ -21,15 +26,14 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
-    int n = *(argv+1);          /* # of processes to simulate */
-    int n_cpu = *(argv+2);      /* # of CPU-bound processes */
-    int seed = *(argv+3);       /* Rand num gen seed */
-    double lambda = *(argv+4);     
-    int ceil = *(argv+5);
+    int n = atoi(*(argv+1));          /* # of processes to simulate */
+    int n_cpu = atoi(*(argv+2));      /* # of CPU-bound processes */
+    int seed = atoi(*(argv+3));       /* Rand num gen seed */
+    double lambda = atof(*(argv+4));     
+    int ceil = atoi(*(argv+5));
 
     // Seed rand num generator
     srand48( seed );
-
 
     // Process creation loop
     int n_cpu_count = 0;
@@ -45,22 +49,22 @@ int main(int argc, char* argv[])
         }
 
         // Process name
-        char p_name[2]; 
+        char p_name[3]; 
         std::sprintf(p_name, "%c%d", 'A' + (n / 10), n % 10);
         
         // Process arrival time
-        int p_arrival_time = floor(nextExp(lambda));
+        int p_arrival_time = floor(nextExp(lambda, ceil));
         
         // Burst times
-        int num_cpu = ceil(drand48() * 32);      // # CPU bursts
+        int num_cpu = std::ceil(drand48() * 32);      // # CPU bursts
         int num_io = num_cpu - 1;
         int num_total = num_cpu + num_io;
-        int[num_total] burst_times = {};
+        int* burst_times = new int[num_total];
 
         // fill combined burst times list
         for (int j = 0; j < num_total; j++)
         {
-            int x = ceil(nextExp(lambda));
+            int x = std::ceil(nextExp(lambda, ceil));
 
             if (j % 2 == 0) x = (is_cpu_bound) ? x*4 : x;
             else x = (is_cpu_bound) ? x : x*8;
@@ -68,9 +72,14 @@ int main(int argc, char* argv[])
             burst_times[j] = x;
         }
 
-        
-
-    }
+        Process* p = new Process();
+        p->id = p_name;
+        p->is_cpu_bound = is_cpu_bound;
+        p->num_cpu = num_cpu;
+        p->burst_index = 0;
+        p->burst_times = burst_times;
+        p->arrival_time = p_arrival_time;
+    }  
 
 }
 

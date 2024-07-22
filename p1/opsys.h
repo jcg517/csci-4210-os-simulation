@@ -7,14 +7,15 @@
 #include <unordered_set>
 using namespace std;
 
-struct
+struct Process
 {
   char* id;
   bool is_cpu_bound;
+  int num_cpu;
+  int* burst_times;
   int burst_index;
-  std::vector<double> cpu_bursts;
-  std::vector<double> io_bursts;
-} Process;
+  int arrival_time;
+};
 
 class OpSys
 {
