@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     double lambda = atof(*(argv+4));     
     int ceil = atoi(*(argv+5));
 
-    if (n > 259 || n <= 0 || n_cpu > n)
+    if (n <= 0)
     {
         std::cerr << "ERROR: Invalid process simulation count\n";
         exit(1);
@@ -118,10 +118,10 @@ int main(int argc, char* argv[])
 
     float cpu_cpu_avg = num_cpu_cpu != 0 ? (cpu_cpu_total / num_cpu_cpu) : 0;
     float cpu_io_avg = num_cpu_io != 0 ? (cpu_io_total / num_cpu_io) : 0;
-    float cpu_avg = std::ceil(1000 * (cpu_cpu_total + io_cpu_total) / (num_cpu_cpu + num_io_cpu)) / 1000;
+    float cpu_avg = (num_cpu_cpu + num_io_cpu) != 0 ? std::ceil(1000 * (cpu_cpu_total + io_cpu_total) / (num_cpu_cpu + num_io_cpu)) / 1000 : 0;
     float io_cpu_avg = num_io_cpu != 0 ? (io_cpu_total / num_io_cpu) : 0;
     float io_io_avg = num_io_io != 0 ? (io_io_total / num_io_io) : 0;
-    float io_avg = std::ceil(1000 * (cpu_io_total + io_io_total) / (num_cpu_io + num_io_io)) / 1000;
+    float io_avg = (num_cpu_io + num_io_io) != 0 ? std::ceil(1000 * (cpu_io_total + io_io_total) / (num_cpu_io + num_io_io)) / 1000 : 0;
 
     for (Process* p : processes)
     {
