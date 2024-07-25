@@ -34,6 +34,18 @@ int main(int argc, char* argv[])
     double lambda = atof(*(argv+4));     
     int ceil = atoi(*(argv+5));
 
+    if (n > 259 || n <= 0 || n_cpu > n)
+    {
+        std::cerr << "ERROR: Invalid process simulation count\n";
+        exit(1);
+    }
+
+    if (lambda == 0)
+    {
+        std::cerr << "ERROR: Lambda cannot be zero\n";
+        exit(1);
+    }
+
     std::cout << "<<< PROJECT PART I\n"
               << "<<< -- process set (n=" << *(argv+1) << ") with " << *(argv+2)
               << (n_cpu != 1 ? " CPU-bound processes\n" : " CPU-bound process\n") << "<<< -- seed=" << *(argv+3) << "; "
@@ -104,11 +116,11 @@ int main(int argc, char* argv[])
         processes.push_back(p);
     }  
 
-    float cpu_cpu_avg = cpu_cpu_total / num_cpu_cpu;
-    float cpu_io_avg = cpu_io_total / num_cpu_io;
+    float cpu_cpu_avg = num_cpu_cpu != 0 ? (cpu_cpu_total / num_cpu_cpu) : 0;
+    float cpu_io_avg = num_cpu_io != 0 ? (cpu_io_total / num_cpu_io) : 0;
     float cpu_avg = std::ceil(1000 * (cpu_cpu_total + io_cpu_total) / (num_cpu_cpu + num_io_cpu)) / 1000;
-    float io_cpu_avg = io_cpu_total / num_io_cpu;
-    float io_io_avg = io_io_total / num_io_io;
+    float io_cpu_avg = num_io_cpu != 0 ? (io_cpu_total / num_io_cpu) : 0;
+    float io_io_avg = num_io_io != 0 ? (io_io_total / num_io_io) : 0;
     float io_avg = std::ceil(1000 * (cpu_io_total + io_io_total) / (num_cpu_io + num_io_io)) / 1000;
 
     for (Process* p : processes)
