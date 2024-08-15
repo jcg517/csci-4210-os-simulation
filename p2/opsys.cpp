@@ -19,17 +19,17 @@ public:
 void OpSys::print_queue(const std::queue<Process*> &ready)
 {
   std::queue<Process*> q = ready;
-  std::cout << "[Q ";
+  std::cout << "[Q";
   if (!q.empty())
   {
     while (!q.empty())
     {
-      std::cout << q.front()->id << " ";
+      std::cout << " " << q.front()->id;
       q.pop();
     }
   } else
   {
-    std::cout << "empty";
+    std::cout << " empty";
   }
   std::cout << "]\n";
 }
@@ -58,13 +58,14 @@ void OpSys::switch_out_cpu( unsigned int current_time )
   Process* p = running;
   running = NULL;
   p->update();
-  if (p->getCpuBurstsLeft() == 0)
+  int bursts_left = p->getCpuBurstsLeft();
+  if (bursts_left == 0)
   {
     std::cout << "time " << p->burstCompletionTime() << "ms: Process " << p->id << " terminated ";
     unfinished.erase(p);
   } else
   {
-    std::cout << "time " << p->burstCompletionTime() << "ms: Process " << p->id << " completed a CPU burst; " << p->getCpuBurstsLeft() << " bursts to go ";
+    std::cout << "time " << p->burstCompletionTime() << "ms: Process " << p->id << " completed a CPU burst; " << bursts_left << " burst" << (bursts_left == 1 ? "" : "s")  << " to go ";
     print_queue(ready_fcfs);
     /* maybe move below to another function? */
     std::cout << "time " << p->burstCompletionTime() << "ms: Process " << p->id << " switching out of CPU; blocking on I/O until time ";
@@ -112,7 +113,7 @@ void OpSys::first_come_first_served()
     /* Check if soonest IO burst is done. */
     if (!waiting.empty())
     {
-      action_queue.push( { waiting.top()->burstCompletionTime(), &OpSys::complete_io, this } );
+      action_queue.push( { waiting.top()->burstCompletionTime()+(switch_wait ? t_cs/2 : 0), &OpSys::complete_io, this } );
     }
 
     /* Check for incoming processes. */
