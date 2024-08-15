@@ -7,15 +7,7 @@
 #include <unordered_set>
 using namespace std;
 
-struct Process
-{
-  char* id;
-  bool is_cpu_bound;
-  int num_cpu;
-  int* burst_times;
-  int burst_index;
-  int arrival_time;
-};
+#include "process.h"
 
 class CompArrivalTime
 {
@@ -23,6 +15,15 @@ public:
   bool operator() (Process* a, Process* b)
   {
     return a->arrival_time > b->arrival_time;
+  }
+};
+
+class CompRearrivalTime
+{
+public:
+  bool operator() (Process* a, Process* b)
+  {
+    return a->rearrival_time > b->rearrival_time;
   }
 };
 
@@ -34,7 +35,7 @@ public:
   std::priority_queue<Process*, vector<Process*>, CompArrivalTime> ready_sjf; /* todo change comp */
   std::priority_queue<Process*, vector<Process*>, CompArrivalTime> ready_srt; /* todo change comp */
   std::priority_queue<Process*, vector<Process*>, CompArrivalTime> ready_rr; /* todo change comp */
-  std::unordered_set<Process*> waiting;
+  std::priority_queue<Process*, vector<Process*>, CompRearrivalTime> waiting;
   std::priority_queue<Process*, vector<Process*>, CompArrivalTime> unarrived;
   int time = 0;
 
