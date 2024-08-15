@@ -175,6 +175,10 @@ int main(int argc, char* argv[])
            << std::fixed << std::setprecision(3) << io_avg << " ms\n";
     simout.close();
 
+    /* Initialize Simulation */
+    OpSys* simulation = new OpSys();
+    simulation->first_come_first_served();
+
     for (Process* p : processes)
     {
         delete [] p->id;
