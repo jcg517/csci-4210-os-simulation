@@ -25,5 +25,5 @@ void Process::preempt( int elapsed_time )
 	int time_remaining = burst_times[burst_index] - elapsed_time;
 	burst_times[burst_index] = time_remaining;
 	this->t = time_remaining;
-	this->tau -= elapsed_time ;
+	this->tau -= elapsed_time;
 } 

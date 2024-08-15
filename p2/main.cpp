@@ -15,7 +15,7 @@ int seed;
 double lambda;
 int ceiling;
 int tcs;
-int alpha;
+float alpha;
 int tslice;
 
 double nextExp()
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     lambda = atof(*(argv+4));     
     ceiling = atoi(*(argv+5));
     tcs = atoi(*(argv+6));                 /* Time (ms) to perform a context switch */
-    alpha = atoi(*(argv+7));
+    alpha = atof(*(argv+7));
     tslice = atoi(*(argv+8));
 
     if (n <= 0)
@@ -135,21 +135,21 @@ int main(int argc, char* argv[])
         processes.push_back(p);
     }  
 
-    float cpu_cpu_avg = num_cpu_cpu != 0 ? (cpu_cpu_total / num_cpu_cpu) : 0;
-    float cpu_io_avg = num_cpu_io != 0 ? (cpu_io_total / num_cpu_io) : 0;
-    float cpu_avg = (num_cpu_cpu + num_io_cpu) != 0 ? std::ceil(1000 * (cpu_cpu_total + io_cpu_total) / (num_cpu_cpu + num_io_cpu)) / 1000 : 0;
-    float io_cpu_avg = num_io_cpu != 0 ? (io_cpu_total / num_io_cpu) : 0;
-    float io_io_avg = num_io_io != 0 ? (io_io_total / num_io_io) : 0;
-    float io_avg = (num_cpu_io + num_io_io) != 0 ? std::ceil(1000 * (cpu_io_total + io_io_total) / (num_cpu_io + num_io_io)) / 1000 : 0;
+    // float cpu_cpu_avg = num_cpu_cpu != 0 ? (cpu_cpu_total / num_cpu_cpu) : 0;
+    // float cpu_io_avg = num_cpu_io != 0 ? (cpu_io_total / num_cpu_io) : 0;
+    // float cpu_avg = (num_cpu_cpu + num_io_cpu) != 0 ? std::ceil(1000 * (cpu_cpu_total + io_cpu_total) / (num_cpu_cpu + num_io_cpu)) / 1000 : 0;
+    // float io_cpu_avg = num_io_cpu != 0 ? (io_cpu_total / num_io_cpu) : 0;
+    // float io_io_avg = num_io_io != 0 ? (io_io_total / num_io_io) : 0;
+    // float io_avg = (num_cpu_io + num_io_io) != 0 ? std::ceil(1000 * (cpu_io_total + io_io_total) / (num_cpu_io + num_io_io)) / 1000 : 0;
 
     for (Process* p : processes)
     {
         // Process name
 
-        // if (p->is_cpu_bound) std::cout << "CPU-bound";
-        // else std::cout << "I/O-bound";
-        // std::cout << " process " << p->id << ": arrival time " << p->arrival_time << "ms; "
-        //     << p->num_cpu_bursts << (p->num_cpu_bursts != 1 ? " CPU bursts:\n" : " CPU burst:\n");
+        if (p->is_cpu_bound) std::cout << "CPU-bound";
+        else std::cout << "I/O-bound";
+        std::cout << " process " << p->id << ": arrival time " << p->arrival_time << "ms; "
+             << p->num_cpu_bursts << (p->num_cpu_bursts != 1 ? " CPU bursts\n" : " CPU burst\n");
         // for (int j = 0; j < p->num_cpu_bursts * 2 - 1; ++j)
         // {
         //     if (j % 2 == 0)
@@ -178,13 +178,16 @@ int main(int argc, char* argv[])
     //        << std::fixed << std::setprecision(3) << io_avg << " ms\n";
     // simout.close();
 
-    /* Initialize Simulation */
+    /* Initialize P2 Simulation */
+    std::cout << "\n<<< PROJECT PART II\n<<< -- t_cs=" << tcs << "ms; alpha=" << std::fixed << std::setprecision(2) << alpha << "; t_slice=" << tslice << "ms\n";
     OpSys* simulation = new OpSys();
     simulation->t_cs = tcs;
     for (Process* p : processes) simulation->unfinished.insert(p); 
     for (Process* p : processes) simulation->unarrived.push(p); 
     simulation->first_come_first_served();
 
+    /* Clean up dynamic memory. */
+    delete simulation;
     for (Process* p : processes)
     {
         delete [] p->id;
