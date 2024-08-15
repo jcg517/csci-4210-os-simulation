@@ -69,7 +69,7 @@ void OpSys::switch_out_cpu( unsigned int current_time )
     print_queue(ready_fcfs);
     /* maybe move below to another function? */
     std::cout << "time " << p->burstCompletionTime() << "ms: Process " << p->id << " switching out of CPU; blocking on I/O until time ";
-    std::cout << p->waitBurst(p->burstCompletionTime()) << "ms ";
+    std::cout << p->waitBurst(p->burstCompletionTime()+t_cs/2) << "ms ";
     waiting.push(p);
   }
   print_queue(ready_fcfs);
@@ -113,7 +113,7 @@ void OpSys::first_come_first_served()
     /* Check if soonest IO burst is done. */
     if (!waiting.empty())
     {
-      action_queue.push( { waiting.top()->burstCompletionTime()+(switch_wait ? t_cs/2 : 0), &OpSys::complete_io, this } );
+      action_queue.push( { waiting.top()->burstCompletionTime(), &OpSys::complete_io, this } );
     }
 
     /* Check for incoming processes. */
