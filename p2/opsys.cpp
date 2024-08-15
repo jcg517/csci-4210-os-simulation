@@ -3,7 +3,8 @@
 struct Action
 {
   int time;
-  void (*func)(unsigned int);
+  void (OpSys::*func)(unsigned int);
+  OpSys* obj;
 };
 
 class CompAction
@@ -15,9 +16,9 @@ public:
   }
 };
 
-void OpSys::print_queue(const queue<Process*> &ready)
+void OpSys::print_queue(const std::queue<Process*> &ready)
 {
-  queue<Process*> q = ready;
+  std::queue<Process*> q = ready;
   std::cout << "[Q ";
   if (!q.empty())
   {
@@ -57,18 +58,19 @@ void OpSys::switch_out_cpu( unsigned int current_time )
   Process* p = running;
   running = NULL;
   p->update();
-  if (p->calcCpuBurstsLeft() == 0)
+  if (p->getCpuBurstsLeft() == 0)
   {
     std::cout << "time " << p->burstCompletionTime() << "ms: Process " << p->id << " terminated ";
     unfinished.erase(p);
   } else
   {
-    std::cout << "time " << p->burstCompletionTime() << "ms: Process " << p->id << " completed a CPU burst; " << p->calcCpuBurstsLeft() << " bursts to go ";
+    std::cout << "time " << p->burstCompletionTime() << "ms: Process " << p->id << " completed a CPU burst; " << p->getCpuBurstsLeft() << " bursts to go ";
     print_queue(ready_fcfs);
     /* maybe move below to another function? */
     std::cout << "time " << p->burstCompletionTime() << "ms: Process " << p->id << " switching out of CPU; blocking on I/O until time ";
     std::cout << p->waitBurst(p->burstCompletionTime()) << "ms ";
     waiting.push(p);
+  }
   print_queue(ready_fcfs);
 }
 
@@ -91,36 +93,37 @@ void OpSys::first_come_first_served()
   while (!this->unfinished.empty())
   {
     /* Search for next 'interesting' event. */
-    std::priority_queue<Action, vector<Action>, CompAction> action_queue;
+    std::priority_queue<Action, std::vector<Action>, CompAction> action_queue;
  
     /* See if CPU isn't doing anything. */
     if (running == NULL)
     {
       if (!ready_fcfs.empty())
-        action_queue.push( { time+t_cs/2+(switch_wait ? t_cs/2 : 0), start_cpu_use } );
+        action_queue.push( { time+t_cs/2+(switch_wait ? t_cs/2 : 0), &OpSys::start_cpu_use, this } );
       switch_wait = false;
     } else
     
     /* See if running process is done. */
     {
-      action_queue.push( { running->burstCompletionTime(), switch_out_cpu } );
+      action_queue.push( { running->burstCompletionTime(), &OpSys::switch_out_cpu, this } );
       switch_wait = true;
     }
 
     /* Check if soonest IO burst is done. */
     if (!waiting.empty())
     {
-      action_queue.push( { waiting.top()->burstCompletionTime(), complete_io } );
+      action_queue.push( { waiting.top()->burstCompletionTime(), &OpSys::complete_io, this } );
     }
 
     /* Check for incoming processes. */
     if (!unarrived.empty())
     {
-      action_queue.push( {unarrived.top()->arrival_time, process_arrive } );
+      action_queue.push( {unarrived.top()->arrival_time, &OpSys::process_arrive, this } );
     }
 
     this->time = action_queue.top().time;
-    action_queue.top().func(this->time);
+    (this->*(action_queue.top().func))(this->time);
+
   }
-  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for FCFS [Q empty]\n"    
+  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for FCFS [Q empty]\n";    
 }

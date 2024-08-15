@@ -5,7 +5,6 @@
 #include <vector>
 #include <queue>
 #include <unordered_set>
-using namespace std;
 
 #include "process.h"
 
@@ -32,16 +31,16 @@ class OpSys
 public:
   Process* running = NULL;
   std::queue<Process*> ready_fcfs;
-  std::priority_queue<Process*, vector<Process*>, CompArrivalTime> ready_sjf; /* todo change comp */
-  std::priority_queue<Process*, vector<Process*>, CompArrivalTime> ready_srt; /* todo change comp */
-  std::priority_queue<Process*, vector<Process*>, CompArrivalTime> ready_rr; /* todo change comp */
-  std::priority_queue<Process*, vector<Process*>, CompRearrivalTime> waiting;
-  std::priority_queue<Process*, vector<Process*>, CompArrivalTime> unarrived;
+  std::priority_queue<Process*, std::vector<Process*>, CompArrivalTime> ready_sjf; /* todo change comp */
+  std::priority_queue<Process*, std::vector<Process*>, CompArrivalTime> ready_srt; /* todo change comp */
+  std::priority_queue<Process*, std::vector<Process*>, CompArrivalTime> ready_rr; /* todo change comp */
+  std::priority_queue<Process*, std::vector<Process*>, CompRearrivalTime> waiting;
+  std::priority_queue<Process*, std::vector<Process*>, CompArrivalTime> unarrived;
   std::unordered_set<Process*> unfinished;
   int time = 0;
   int t_cs;
 
-  void print_queue(const queue<Process*> &ready);
+  void print_queue(const std::queue<Process*> &ready);
   void process_arrive(unsigned int current_time);
   void switch_out_cpu(unsigned int current_time);
   void complete_io(unsigned int current_time);

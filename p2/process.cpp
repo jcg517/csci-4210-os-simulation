@@ -1,15 +1,11 @@
 #include "process.h"
 
-Process::Process()
-{
-}
-
 
 void Process::update() 
 {
 	this->burst_index++;
 
-	if (onCPUBurst) 
+	if (onCPUBurst()) 
 	{
 		this->prev_t = t;
 		this->prev_tau = tau;
@@ -30,4 +26,4 @@ void Process::preempt( int elapsed_time )
 	burst_times[burst_index] = time_remaining;
 	this->t = time_remaining;
 	this->tau -= elapsed_time ;
-}
+} 

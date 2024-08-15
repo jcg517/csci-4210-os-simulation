@@ -123,6 +123,9 @@ int main(int argc, char* argv[])
         Process* p = new Process();
         p->id = new char[3];
         std::sprintf(p->id, "%c%d", 'A' + (i / 10), i % 10);
+        p->tau = 1 / lambda;
+        p->alpha = alpha;
+        p->t = burst_times[0];
         p->is_cpu_bound = is_cpu_bound;
         p->num_cpu_bursts = num_cpu;
         p->num_total_bursts = num_total;
@@ -143,40 +146,43 @@ int main(int argc, char* argv[])
     {
         // Process name
 
-        if (p->is_cpu_bound) std::cout << "CPU-bound";
-        else std::cout << "I/O-bound";
-        std::cout << " process " << p->id << ": arrival time " << p->arrival_time << "ms; "
-            << p->num_cpu_bursts << (p->num_cpu_bursts != 1 ? " CPU bursts:\n" : " CPU burst:\n");
-        for (int j = 0; j < p->num_cpu_bursts * 2 - 1; ++j)
-        {
-            if (j % 2 == 0)
-                std::cout << "==> CPU burst " << p->burst_times[j] << "ms";
-            else std::cout << " ==> I/O burst " << p->burst_times[j] << "ms\n";
-        }
-        std::cout << "\n";
+        // if (p->is_cpu_bound) std::cout << "CPU-bound";
+        // else std::cout << "I/O-bound";
+        // std::cout << " process " << p->id << ": arrival time " << p->arrival_time << "ms; "
+        //     << p->num_cpu_bursts << (p->num_cpu_bursts != 1 ? " CPU bursts:\n" : " CPU burst:\n");
+        // for (int j = 0; j < p->num_cpu_bursts * 2 - 1; ++j)
+        // {
+        //     if (j % 2 == 0)
+        //         std::cout << "==> CPU burst " << p->burst_times[j] << "ms";
+        //     else std::cout << " ==> I/O burst " << p->burst_times[j] << "ms\n";
+        // }
+        // std::cout << "\n";
     }
 
-    ofstream simout;
-    simout.open("simout.txt");
-    simout << "-- number of processes: " << n << "\n";
-    simout << "-- number of CPU-bound processes: " << n_cpu << "\n";
-    simout << "-- number of I/O-bound processes: " << (n - n_cpu) << "\n";
-    simout << "-- CPU-bound average CPU burst time: " 
-           << std::fixed << std::setprecision(3) << std::ceil(1000 * cpu_cpu_avg) / 1000 << " ms\n";
-    simout << "-- I/O-bound average CPU burst time: " 
-           << std::fixed << std::setprecision(3) << std::ceil(1000 * io_cpu_avg) / 1000 << " ms\n";
-    simout << "-- overall average CPU burst time: " 
-           << std::fixed << std::setprecision(3) << cpu_avg << " ms\n";
-    simout << "-- CPU-bound average I/O burst time: " 
-           << std::fixed << std::setprecision(3) << std::ceil(1000 * cpu_io_avg) / 1000 << " ms\n";
-    simout << "-- I/O-bound average I/O burst time: " 
-           << std::fixed << std::setprecision(3) << std::ceil(1000 * io_io_avg) / 1000 << " ms\n";
-    simout << "-- overall average I/O burst time: " 
-           << std::fixed << std::setprecision(3) << io_avg << " ms\n";
-    simout.close();
+    // ofstream simout;
+    // simout.open("simout.txt");
+    // simout << "-- number of processes: " << n << "\n";
+    // simout << "-- number of CPU-bound processes: " << n_cpu << "\n";
+    // simout << "-- number of I/O-bound processes: " << (n - n_cpu) << "\n";
+    // simout << "-- CPU-bound average CPU burst time: " 
+    //        << std::fixed << std::setprecision(3) << std::ceil(1000 * cpu_cpu_avg) / 1000 << " ms\n";
+    // simout << "-- I/O-bound average CPU burst time: " 
+    //        << std::fixed << std::setprecision(3) << std::ceil(1000 * io_cpu_avg) / 1000 << " ms\n";
+    // simout << "-- overall average CPU burst time: " 
+    //        << std::fixed << std::setprecision(3) << cpu_avg << " ms\n";
+    // simout << "-- CPU-bound average I/O burst time: " 
+    //        << std::fixed << std::setprecision(3) << std::ceil(1000 * cpu_io_avg) / 1000 << " ms\n";
+    // simout << "-- I/O-bound average I/O burst time: " 
+    //        << std::fixed << std::setprecision(3) << std::ceil(1000 * io_io_avg) / 1000 << " ms\n";
+    // simout << "-- overall average I/O burst time: " 
+    //        << std::fixed << std::setprecision(3) << io_avg << " ms\n";
+    // simout.close();
 
     /* Initialize Simulation */
     OpSys* simulation = new OpSys();
+    simulation->t_cs = tcs;
+    for (Process* p : processes) simulation->unfinished.insert(p); 
+    for (Process* p : processes) simulation->unarrived.push(p); 
     simulation->first_come_first_served();
 
     for (Process* p : processes)

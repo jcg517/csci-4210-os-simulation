@@ -1,16 +1,17 @@
 #ifndef __PROCESS_H__
 #define __PROCESS_H__
 
+#include <cmath>
+
 class Process {
-private:
+public:
   int burst_completion_time = 0;
   int burst_index = 0;
-  int t = burst_times[0];
-  int tau = 1 / lambda;
   int prev_t;
   int prev_tau; 
-
-public:
+  int alpha;
+  int tau;
+  int t;
   char * id;
   int * burst_times;
   int arrival_time;
@@ -30,8 +31,8 @@ public:
   int burstCompletionTime() { return burst_completion_time; };
 
   void finishBurst() { burst_completion_time = 0; };
-  void update() {}; // Increments burst index
-  void preempt( int elapsed_time ) {};
+  void update(); // Increments burst index
+  void preempt( int elapsed_time );
 };
 
 #endif
