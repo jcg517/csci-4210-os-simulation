@@ -23,7 +23,7 @@ class CompRearrivalTime
 public:
   bool operator() (Process* a, Process* b)
   {
-    return a->burst_completion_time > b->burst_completion_time;
+    return a->burstCompletionTime() > b->burstCompletionTime();
   }
 };
 

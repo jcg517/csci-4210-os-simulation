@@ -7,16 +7,23 @@
 #include <cstring>
 #include <list>
 #include <iomanip>
-
 #include "opsys.h"
 
+int n;
+int n_cpu;
+int seed;
+double lambda;
+int ceiling;
+int tcs;
+int alpha;
+int tslice;
 
-double nextExp(double lambda, int ceil)
+double nextExp()
 {
     while (true)
     {
         double x = -log(drand48()) / lambda;
-        if (x < ceil) return x;
+        if (x < ceiling) return x;
     }
 }
 
@@ -28,14 +35,14 @@ int main(int argc, char* argv[])
 		  exit(1);
 	  }
 
-    int n = atoi(*(argv+1));          /* # of processes to simulate */
-    int n_cpu = atoi(*(argv+2));      /* # of CPU-bound processes */
-    int seed = atoi(*(argv+3));       /* Rand num gen seed */
-    double lambda = atof(*(argv+4));     
-    int ceil = atoi(*(argv+5));
-    int tcs = atoi(*(argv+6));                 /* Time (ms) to perform a context switch */
-    int alpha = atoi(*(argv+7));
-    int tslice = atoi(*(argv+8));
+    n = atoi(*(argv+1));          /* # of processes to simulate */
+    n_cpu = atoi(*(argv+2));      /* # of CPU-bound processes */
+    seed = atoi(*(argv+3));       /* Rand num gen seed */
+    lambda = atof(*(argv+4));     
+    ceiling = atoi(*(argv+5));
+    tcs = atoi(*(argv+6));                 /* Time (ms) to perform a context switch */
+    alpha = atoi(*(argv+7));
+    tslice = atoi(*(argv+8));
 
     if (n <= 0)
     {
@@ -77,7 +84,7 @@ int main(int argc, char* argv[])
         if (i < n_cpu) is_cpu_bound = true;
         
         // Process arrival time
-        int p_arrival_time = floor(nextExp(lambda, ceil));
+        int p_arrival_time = floor(nextExp());
         
         // Burst times
         int num_cpu = std::ceil(drand48() * 32);      // # CPU bursts
@@ -88,7 +95,7 @@ int main(int argc, char* argv[])
         // fill combined burst times list
         for (int j = 0; j < num_total; j++)
         {
-            int x = std::ceil(nextExp(lambda, ceil));
+            int x = std::ceil(nextExp());
 
             if (is_cpu_bound)
             {
@@ -117,8 +124,8 @@ int main(int argc, char* argv[])
         p->id = new char[3];
         std::sprintf(p->id, "%c%d", 'A' + (i / 10), i % 10);
         p->is_cpu_bound = is_cpu_bound;
-        p->num_cpu = num_cpu;
-        p->burst_index = 0;
+        p->num_cpu_bursts = num_cpu;
+        p->num_total_bursts = num_total;
         p->burst_times = burst_times;
         p->arrival_time = p_arrival_time;
 
@@ -139,8 +146,8 @@ int main(int argc, char* argv[])
         if (p->is_cpu_bound) std::cout << "CPU-bound";
         else std::cout << "I/O-bound";
         std::cout << " process " << p->id << ": arrival time " << p->arrival_time << "ms; "
-            << p->num_cpu << (p->num_cpu != 1 ? " CPU bursts:\n" : " CPU burst:\n");
-        for (int j = 0; j < p->num_cpu * 2 - 1; ++j)
+            << p->num_cpu_bursts << (p->num_cpu_bursts != 1 ? " CPU bursts:\n" : " CPU burst:\n");
+        for (int j = 0; j < p->num_cpu_bursts * 2 - 1; ++j)
         {
             if (j % 2 == 0)
                 std::cout << "==> CPU burst " << p->burst_times[j] << "ms";
@@ -167,6 +174,10 @@ int main(int argc, char* argv[])
     simout << "-- overall average I/O burst time: " 
            << std::fixed << std::setprecision(3) << io_avg << " ms\n";
     simout.close();
+
+    /* Initialize Simulation */
+    OpSys* simulation = new OpSys();
+    simulation->first_come_first_served();
 
     for (Process* p : processes)
     {
