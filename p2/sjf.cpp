@@ -60,12 +60,12 @@ void OpSys::switch_out_cpu_sjf( unsigned int current_time )
     p->waitBurst(current_time+t_cs/2);
     if (!TRUNCATE || current_time<TRUNC_TIME)
     {
-      std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << p->getTau() << "ms) completed a CPU burst; " << bursts_left << " burst" << (bursts_left == 1 ? "" : "s")  << " to go ";
+      std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << old_tau << "ms) completed a CPU burst; " << bursts_left << " burst" << (bursts_left == 1 ? "" : "s")  << " to go ";
       print_priority_queue(ready_sjf);
       /* maybe move below to another function? */
       std::cout << "time " << current_time << "ms: Recalculated tau for process " << p->id << ": old tau " << old_tau << "ms ==> new tau " << p->getTau() << "ms ";
       print_priority_queue(ready_sjf);
-      std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << p->getTau() << "ms) switching out of CPU; blocking on I/O until time " << p->burstCompletionTime() << "ms ";
+      std::cout << "time " << current_time << "ms: Process " << p->id << " switching out of CPU; blocking on I/O until time " << p->burstCompletionTime() << "ms ";
       print_priority_queue(ready_sjf);
     }
     waiting.push(p);

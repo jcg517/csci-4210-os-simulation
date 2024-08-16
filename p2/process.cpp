@@ -1,24 +1,20 @@
 #include "process.h"
 
-
 void Process::update() 
 {
-	this->burst_index++;
+  this->burst_index++;
 
 	if (onCPUBurst()) 
 	{
 		this->prev_t = t;
-		this->prev_tau = tau;
 		this->t = burst_times[burst_index];
-		this->tau = (alpha * prev_t) + ((1.0-alpha) * prev_tau);
-
-	} 
+	}
 	else //onIOBurst
 	{
-
+		this->prev_tau = tau;
+		this->tau = std::ceil((alpha * burst_times[burst_index-1]) + ((1.0-alpha) * prev_tau));
 	}
 }
-
 
 void Process::preempt( int elapsed_time )
 {

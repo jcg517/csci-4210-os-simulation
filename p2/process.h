@@ -9,7 +9,7 @@ public:
   int burst_index = 0;
   int prev_t;
   int prev_tau; 
-  float alpha;
+  double alpha;
   int tau;
   int tau_0;
   int t;

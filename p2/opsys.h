@@ -5,7 +5,7 @@
 #include <vector>
 #include <queue>
 #include <unordered_set>
-
+#include <cstring>
 #include "process.h"
 
 #define TRUNCATE true
@@ -25,6 +25,10 @@ class CompPredBurstTime
 public:
   bool operator() (Process* a, Process* b)
   {
+    if (a->getTau() == b->getTau())
+    {
+      return std::strcmp(a->id, b->id) > 0;
+    }
     return a->getTau() > b->getTau();
   }
 };
