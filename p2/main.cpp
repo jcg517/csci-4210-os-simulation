@@ -123,7 +123,8 @@ int main(int argc, char* argv[])
         Process* p = new Process();
         p->id = new char[3];
         std::sprintf(p->id, "%c%d", 'A' + (i / 10), i % 10);
-        p->tau = 1 / lambda;
+        p->tau_0 = 1 / lambda;
+        p->tau = p->tau_0;
         p->alpha = alpha;
         p->t = burst_times[0];
         p->is_cpu_bound = is_cpu_bound;
@@ -185,6 +186,16 @@ int main(int argc, char* argv[])
     for (Process* p : processes) simulation->unfinished.insert(p); 
     for (Process* p : processes) simulation->unarrived.push(p); 
     simulation->first_come_first_served();
+
+    /* Reset and readd processes for next algorithm. */
+    std::cout << "\n";
+    for (Process* p : processes)
+    {
+      p->reset();
+      simulation->unfinished.insert(p);
+      simulation->unarrived.push(p);
+    }
+    simulation->shortest_job_first();
 
     /* Clean up dynamic memory. */
     delete simulation;

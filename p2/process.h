@@ -11,6 +11,7 @@ public:
   int prev_tau; 
   float alpha;
   int tau;
+  int tau_0;
   int t;
   char * id;
   int * burst_times;
@@ -33,6 +34,8 @@ public:
   void finishBurst() { burst_completion_time = 0; };
   void update(); // Increments burst index
   void preempt( int elapsed_time );
+
+  void reset();
 };
 
 #endif

@@ -1,25 +1,6 @@
 #include "opsys.h"
 
-#define TRUNCATE true
-#define TRUNC_TIME 10000
-
-struct Action
-{
-  int time;
-  void (OpSys::*func)(unsigned int);
-  OpSys* obj;
-};
-
-class CompAction
-{
-public:
-  bool operator() (Action a, Action b)
-  {
-    return a.time > b.time;
-  }
-};
-
-void OpSys::print_queue(const std::queue<Process*> &ready)
+void print_queue(const std::queue<Process*> &ready)
 {
   std::queue<Process*> q = ready;
   std::cout << "[Q";
@@ -37,7 +18,7 @@ void OpSys::print_queue(const std::queue<Process*> &ready)
   std::cout << "]\n";
 }
 
-void OpSys::process_arrive( unsigned int current_time )
+void OpSys::process_arrive_fcfs( unsigned int current_time )
 {
   Process* p = unarrived.top();
   unarrived.pop();
@@ -49,7 +30,7 @@ void OpSys::process_arrive( unsigned int current_time )
   }
 }
 
-void OpSys::start_cpu_use( unsigned int current_time )
+void OpSys::start_cpu_use_fcfs( unsigned int current_time )
 {
   Process* p = ready_fcfs.front();
   ready_fcfs.pop();
@@ -62,7 +43,7 @@ void OpSys::start_cpu_use( unsigned int current_time )
   }
 }
 
-void OpSys::switch_out_cpu( unsigned int current_time )
+void OpSys::switch_out_cpu_fcfs( unsigned int current_time )
 {
   Process* p = running;
   running = NULL;
@@ -88,7 +69,7 @@ void OpSys::switch_out_cpu( unsigned int current_time )
   }
 }
 
-void OpSys::complete_io( unsigned int current_time )
+void OpSys::complete_io_fcfs( unsigned int current_time )
 {
   Process* p = waiting.top();
   waiting.pop();
@@ -116,26 +97,26 @@ void OpSys::first_come_first_served()
     if (running == NULL)
     {
       if (!ready_fcfs.empty())
-        action_queue.push( { time+t_cs/2+(switch_wait ? t_cs/2 : 0), &OpSys::start_cpu_use, this } );
+        action_queue.push( { time+t_cs/2+(switch_wait ? t_cs/2 : 0), &OpSys::start_cpu_use_fcfs } );
       switch_wait = false;
     } else
     
     /* See if running process is done. */
     {
-      action_queue.push( { running->burstCompletionTime(), &OpSys::switch_out_cpu, this } );
+      action_queue.push( { running->burstCompletionTime(), &OpSys::switch_out_cpu_fcfs } );
       switch_wait = true;
     }
 
     /* Check if soonest IO burst is done. */
     if (!waiting.empty())
     {
-      action_queue.push( { waiting.top()->burstCompletionTime(), &OpSys::complete_io, this } );
+      action_queue.push( { waiting.top()->burstCompletionTime(), &OpSys::complete_io_fcfs } );
     }
 
     /* Check for incoming processes. */
     if (!unarrived.empty())
     {
-      action_queue.push( {unarrived.top()->arrival_time, &OpSys::process_arrive, this } );
+      action_queue.push( {unarrived.top()->arrival_time, &OpSys::process_arrive_fcfs } );
     }
 
     this->time = action_queue.top().time;
