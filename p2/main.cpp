@@ -183,6 +183,7 @@ int main(int argc, char* argv[])
     std::cout << "\n<<< PROJECT PART II\n<<< -- t_cs=" << tcs << "ms; alpha=" << std::fixed << std::setprecision(2) << alpha << "; t_slice=" << tslice << "ms\n";
     OpSys* simulation = new OpSys();
     simulation->t_cs = tcs;
+    simulation->tslice = tslice;
     for (Process* p : processes) simulation->unfinished.insert(p); 
     for (Process* p : processes) simulation->unarrived.push(p); 
     simulation->first_come_first_served();
@@ -196,6 +197,14 @@ int main(int argc, char* argv[])
       simulation->unarrived.push(p);
     }
     simulation->shortest_job_first();
+    std::cout << "\n";
+    for (Process* p : processes)
+    {
+      p->reset();
+      simulation->unfinished.insert(p);
+      simulation->unarrived.push(p);
+    }
+    simulation->round_robin();
 
     /* Clean up dynamic memory. */
     delete simulation;

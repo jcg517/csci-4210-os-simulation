@@ -26,6 +26,7 @@ void Process::preempt( int elapsed_time )
 	burst_times[burst_index] = time_remaining;
 	this->t = time_remaining;
 	this->tau -= elapsed_time;
+	this->time_remaining = time_remaining;
 } 
 
 void Process::reset()
