@@ -1,6 +1,5 @@
 #include "process.h"
 
-
 void Process::update() 
 {
 	this->burst_index++;
@@ -9,24 +8,23 @@ void Process::update()
 	if (onCPUBurst()) 
 	{
 		this->prev_t = t;
-		this->prev_tau = tau;
 		this->t = burst_times[burst_index];
-		this->tau = (alpha * prev_t) + ((1.0-alpha) * prev_tau);
-
-	} 
+	}
 	else //onIOBurst
 	{
-
+		this->prev_tau = tau;
+		this->tau = std::ceil((alpha * burst_times[burst_index-1]) + ((1.0-alpha) * prev_tau));
 	}
 }
 
-
-void Process::preempt(int elapsed_time) {
-    this->time_remaining = burst_times[burst_index] - elapsed_time;
-    burst_times[burst_index] = this->time_remaining;
-    this->tau -= elapsed_time;
-    this->burst_completion_time -= elapsed_time;
-}
+void Process::preempt( int elapsed_time )
+{
+	int time_remaining = burst_times[burst_index] - elapsed_time;
+	burst_times[burst_index] = time_remaining;
+	// this->t = time_remaining;
+	this->tau -= elapsed_time;
+	this->time_remaining = time_remaining;
+} 
 
 void Process::reset()
 {

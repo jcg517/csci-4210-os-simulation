@@ -15,7 +15,7 @@ int seed;
 double lambda;
 int ceiling;
 int tcs;
-float alpha;
+double alpha;
 int tslice;
 
 double nextExp()
@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
         Process* p = new Process();
         p->id = new char[3];
         std::sprintf(p->id, "%c%d", 'A' + (i / 10), i % 10);
-        p->tau_0 = 1 / lambda;
+        p->tau_0 = std::ceil(1.0 / lambda);
         p->tau = p->tau_0;
         p->alpha = alpha;
         p->t = burst_times[0];
