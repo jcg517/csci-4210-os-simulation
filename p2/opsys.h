@@ -49,12 +49,15 @@ public:
   std::queue<Process*> ready_fcfs;
   std::priority_queue<Process*, std::vector<Process*>, CompPredBurstTime> ready_sjf;
   std::priority_queue<Process*, std::vector<Process*>, CompPredBurstTime> ready_srt; /* todo change comp */
-  std::priority_queue<Process*, std::vector<Process*>, CompPredBurstTime> ready_rr; /* todo change comp */
+  std::queue<Process*> ready_rr; 
   std::priority_queue<Process*, std::vector<Process*>, CompBurstCompletionTime> waiting;
   std::priority_queue<Process*, std::vector<Process*>, CompArrivalTime> unarrived;
   std::unordered_set<Process*> unfinished;
   int time = 0;
   int t_cs;
+  int tslice;
+
+  void print_queue(const std::queue<Process*> &ready);
   
   /* FCFS */
   void process_arrive_fcfs(unsigned int current_time);
@@ -74,6 +77,11 @@ public:
   void shortest_remaining_time();
   
   /* RR */
+  void process_arrive_rr(unsigned int current_time);
+  void switch_out_cpu_rr(unsigned int current_time);
+  void complete_io_rr(unsigned int current_time);
+  void start_cpu_use_rr(unsigned int current_time);
+  void ts_expiration_rr(unsigned int current_time);
   void round_robin();
 };
 

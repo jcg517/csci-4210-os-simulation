@@ -2,7 +2,8 @@
 
 void Process::update() 
 {
-  this->burst_index++;
+	this->burst_index++;
+	this->time_remaining = 0;
 
 	if (onCPUBurst()) 
 	{
@@ -20,8 +21,9 @@ void Process::preempt( int elapsed_time )
 {
 	int time_remaining = burst_times[burst_index] - elapsed_time;
 	burst_times[burst_index] = time_remaining;
-	this->t = time_remaining;
+	// this->t = time_remaining;
 	this->tau -= elapsed_time;
+	this->time_remaining = time_remaining;
 } 
 
 void Process::reset()
@@ -32,4 +34,5 @@ void Process::reset()
 	this->prev_t = t;
 	this->tau = tau_0;
 	this->prev_tau = tau;
+	this->time_remaining = 0;
 }

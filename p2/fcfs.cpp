@@ -1,6 +1,6 @@
 #include "opsys.h"
 
-void print_queue(const std::queue<Process*> &ready)
+void OpSys::print_queue(const std::queue<Process*> &ready)
 {
   std::queue<Process*> q = ready;
   std::cout << "[Q";
