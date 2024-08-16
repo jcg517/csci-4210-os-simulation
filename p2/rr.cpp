@@ -1,6 +1,6 @@
 #include "opsys.h"
 
-#define TRUNCATE true
+#define TRUNCATE false
 #define TRUNC_TIME 10000
 
 
@@ -25,7 +25,13 @@ void OpSys::start_cpu_use_rr( unsigned int current_time )
   p->waitBurst(current_time);
   if (!TRUNCATE || current_time<TRUNC_TIME)
   {
-    std::cout << "time " << current_time << "ms: Process " << p->id << " started using the CPU for " << p->getT() << "ms burst ";
+    if (p-> time_remaining < p-> burstCompletionTime() && p->time_remaining != 0)
+    {
+      std::cout << "time " << current_time << "ms: Process " << p->id << " started using the CPU for remaining " << p->time_remaining << "ms of " << p->getT() << "ms burst ";
+    } else 
+    {
+      std::cout << "time " << current_time << "ms: Process " << p->id << " started using the CPU for " << p->getT() << "ms burst ";
+    }
     print_queue(ready_rr);
   }
 }

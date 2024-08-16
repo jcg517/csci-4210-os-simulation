@@ -20,7 +20,7 @@ public:
   int num_cpu_bursts;
   int num_total_bursts;
   int last_cpu_burst_start; 
-  int time_remaining;
+  int time_remaining = 0;
 
   bool onCPUBurst() { return burst_index % 2 == 0; };
   bool onIOBurst() { return burst_index % 2 != 0; };
