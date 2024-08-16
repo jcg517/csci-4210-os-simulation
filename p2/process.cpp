@@ -21,14 +21,12 @@ void Process::update()
 }
 
 
-void Process::preempt( int elapsed_time )
-{
-	int time_remaining = burst_times[burst_index] - elapsed_time;
-	burst_times[burst_index] = time_remaining;
-	// this->t = time_remaining;
-	this->tau -= elapsed_time;
-	this->time_remaining = time_remaining;
-} 
+void Process::preempt(int elapsed_time) {
+    this->time_remaining = burst_times[burst_index] - elapsed_time;
+    burst_times[burst_index] = this->time_remaining;
+    this->tau -= elapsed_time;
+    this->burst_completion_time -= elapsed_time;
+}
 
 void Process::reset()
 {

@@ -1,9 +1,5 @@
 #include "opsys.h"
 
-#define TRUNCATE false
-#define TRUNC_TIME 10000
-
-
 void OpSys::process_arrive_rr( unsigned int current_time )
 {
   Process* p = unarrived.top();
@@ -98,6 +94,7 @@ void OpSys::ts_expiration_rr(unsigned int current_time)
 
 void OpSys::round_robin()
 {
+  int adjust_time = 0;
   bool switch_wait = false;
   this->time = 0;
   std::cout << "time " << this->time << "ms: Simulator started for RR [Q empty]\n";
@@ -140,8 +137,22 @@ void OpSys::round_robin()
 				action_queue.push( { (running->last_cpu_burst_start + tslice), &OpSys::ts_expiration_rr } );
 			} 
 		}
+    int next_time = action_queue.top().time;
+    
 
-    this->time = action_queue.top().time;
+    if (adjust_time == 1) 
+    {
+      next_time -= 1;
+      adjust_time = 0;
+    } 
+
+    bool is_adding_to_ready_queue = (action_queue.top().func == &OpSys::process_arrive_rr || action_queue.top().func == &OpSys::complete_io_rr);
+
+    if ((time + (t_cs / 2) > next_time) && is_adding_to_ready_queue) {
+        adjust_time = 1;
+    }
+    
+    this->time = next_time;
     (this->*(action_queue.top().func))(this->time);
   }
 
