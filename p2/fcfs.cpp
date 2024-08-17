@@ -1,23 +1,5 @@
 #include "opsys.h"
 
-void OpSys::print_queue(const std::queue<Process*> &ready)
-{
-  std::queue<Process*> q = ready;
-  std::cout << "[Q";
-  if (!q.empty())
-  {
-    while (!q.empty())
-    {
-      std::cout << " " << q.front()->id;
-      q.pop();
-    }
-  } else
-  {
-    std::cout << " empty";
-  }
-  std::cout << "]\n";
-}
-
 void OpSys::process_arrive_fcfs( unsigned int current_time )
 {
   Process* p = unarrived.top();
@@ -32,8 +14,8 @@ void OpSys::process_arrive_fcfs( unsigned int current_time )
 
 void OpSys::start_cpu_use_fcfs( unsigned int current_time )
 {
-  Process* p = ready_fcfs.front();
-  ready_fcfs.pop();
+  Process* p = switching_to_run;
+  this->switching_to_run = NULL;
   this->running = p;
   p->waitBurst(current_time);
   if (!TRUNCATE || current_time<TRUNC_TIME)
@@ -97,7 +79,16 @@ void OpSys::first_come_first_served()
     if (running == NULL)
     {
       if (!ready_fcfs.empty())
-        action_queue.push( { time+t_cs/2+(switch_wait ? t_cs/2 : 0), &OpSys::start_cpu_use_fcfs } );
+      {
+        if (switching_to_run == NULL)
+        {
+          switching_to_run = ready_fcfs.front();
+          ready_fcfs.pop();
+          switching_to_run->last_switch_time=this->time;
+        }
+
+        action_queue.push( { switching_to_run->last_switch_time+t_cs/2+(switch_wait ? t_cs/2 : 0), &OpSys::start_cpu_use_fcfs } );
+      }
       switch_wait = false;
     } else
     

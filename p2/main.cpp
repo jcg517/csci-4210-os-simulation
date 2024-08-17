@@ -132,6 +132,8 @@ int main(int argc, char* argv[])
         p->num_total_bursts = num_total;
         p->burst_times = burst_times;
         p->arrival_time = p_arrival_time;
+        p->time_remaining = p->t;
+        p->tau_remaining = p->tau;
 
         processes.push_back(p);
     }  
@@ -197,6 +199,14 @@ int main(int argc, char* argv[])
       simulation->unarrived.push(p);
     }
     simulation->shortest_job_first();
+    std::cout << "\n";
+    for (Process* p : processes)
+    {
+      p->reset();
+      simulation->unfinished.insert(p);
+      simulation->unarrived.push(p);
+    }
+    simulation->shortest_remaining_time();
     std::cout << "\n";
     for (Process* p : processes)
     {
