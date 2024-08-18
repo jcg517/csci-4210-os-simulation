@@ -19,7 +19,7 @@ void Process::update()
   }
 }
 
-void Process::preempt( int elapsed_time )
+void Process::preempt( unsigned int elapsed_time )
 {
 	this->time_remaining = this->time_remaining - elapsed_time;
 	// burst_times[burst_index] = time_remaining;

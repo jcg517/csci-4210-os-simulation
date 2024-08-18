@@ -1,11 +1,24 @@
 #include "opsys.h"
 
+bool should_preempt(Process* cur, Process* top )
+{ 
+  return cur->tau_remaining > top->tau_remaining;
+}
+
 void OpSys::process_arrive_srt( unsigned int current_time )
 {
   Process* p = unarrived.top();
   unarrived.pop();
   ready_srt.push(p);
-  
+  //if (running != NULL)
+  //{
+  //  running->preempt(current_time - running->last_cpu_burst_start);
+  //  if (should_preempt(running, p))
+  //  {
+  //    ready_srt.push(running);
+  //    running = NULL;
+  //  }
+  //} 
   if (!TRUNCATE || current_time<TRUNC_TIME)
   {
     std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << p->getTau() << "ms) arrived; added to ready queue ";
@@ -18,10 +31,17 @@ void OpSys::start_cpu_use_srt( unsigned int current_time )
   Process* p = switching_to_run;
   this->switching_to_run = NULL;
   this->running = p;
+  p->last_cpu_burst_start = current_time;
   p->waitBurst(current_time);
   if (!TRUNCATE || current_time<TRUNC_TIME)
   {
-    std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << p->getTau() << "ms) started using the CPU for " << p->getT() << "ms burst ";
+    if (p->time_remaining < p->getT())
+    {
+      std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << p->getTau() << "ms) started using the CPU for remaining " << p->time_remaining << "ms of " << p->getT() << "ms burst ";
+    } else
+    {
+      std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << p->getTau() << "ms) started using the CPU for " << p->getT() << "ms burst ";
+    }
     print_priority_queue(ready_srt);
   }
 }
@@ -53,6 +73,8 @@ void OpSys::switch_out_cpu_srt( unsigned int current_time )
     }
     waiting.push(p);
   }
+  switching_to_io = p;
+  p->last_switch_time = current_time;
 }
 
 void OpSys::complete_io_srt( unsigned int current_time )
@@ -61,6 +83,23 @@ void OpSys::complete_io_srt( unsigned int current_time )
   waiting.pop();
   p->update();
   ready_srt.push(p);
+  if (running != NULL)
+  {
+    running->preempt(current_time - running->last_cpu_burst_start);
+    if (should_preempt(running, p))
+    {
+      if (!TRUNCATE || current_time<TRUNC_TIME)
+      {
+        std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << p->getTau() << "ms) completed I/O; preempting " << running->id << " (predicted remaining time " << running->tau_remaining << "ms) ";
+        print_priority_queue(ready_srt);
+      }
+      switching_to_ready = running;
+      running->last_switch_time = current_time;
+      running = NULL;
+      p->finishBurst();
+      return;
+    }
+  }
   if (!TRUNCATE || current_time<TRUNC_TIME)
   {
     std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << p->getTau() << "ms) completed I/O; added to ready queue ";
@@ -69,48 +108,67 @@ void OpSys::complete_io_srt( unsigned int current_time )
   p->finishBurst();
 }
 
+void OpSys::start_switch_in_srt(unsigned int current_time)
+{
+  switching_to_run = ready_srt.top();
+  ready_srt.pop();
+  switching_to_run->last_switch_time = current_time;
+}
+
+void OpSys::finish_preempt_switch_out_srt(unsigned int current_time)
+{
+  ready_srt.push(switching_to_ready);
+  switching_to_ready = NULL;
+  if (current_time == 0) return;
+}
+
 void OpSys::shortest_remaining_time()
 {
-  bool switch_wait = false;
   this->time = 0;
   std::cout << "time " << this->time << "ms: Simulator started for SRT [Q empty]\n";
   while (!this->unfinished.empty())
   {
     /* Search for next 'interesting' event. */
     std::priority_queue<Action, std::vector<Action>, CompAction> action_queue;
+
+    if (switching_to_io != NULL)
+    {
+      action_queue.push( { switching_to_io->last_switch_time+t_cs/2, &OpSys::finish_io_switch_out, 0 } );
+    }
  
     /* See if CPU isn't doing anything. */
     if (running == NULL)
     {
-      if (!ready_srt.empty())
+      if (switching_to_ready != NULL)
+      {
+        action_queue.push( { switching_to_ready->last_switch_time+t_cs/2, &OpSys::finish_preempt_switch_out_srt, 0 } );
+      } else
       {
         if (switching_to_run == NULL)
         {
-          switching_to_run = ready_srt.top();
-          ready_srt.pop();
-          switching_to_run->last_switch_time=this->time;
+          if (!ready_srt.empty()) action_queue.push( { this->time+t_cs/2, &OpSys::start_switch_in_srt, 0 } );
+        } else
+        {
+          action_queue.push( { switching_to_run->last_switch_time, &OpSys::start_cpu_use_srt, 2 } );
         }
-        action_queue.push( { switching_to_run->last_switch_time+t_cs/2+(switch_wait ? t_cs/2 : 0), &OpSys::start_cpu_use_srt } );
       }
-      switch_wait = false;
     } else
     
     /* See if running process is done. */
     {
-      action_queue.push( { running->burstCompletionTime(), &OpSys::switch_out_cpu_srt } );
-      switch_wait = true;
+      action_queue.push( { running->burstCompletionTime(), &OpSys::switch_out_cpu_srt, 1 } );
     }
 
     /* Check if soonest IO burst is done. */
     if (!waiting.empty())
     {
-      action_queue.push( { waiting.top()->burstCompletionTime(), &OpSys::complete_io_srt } );
+      action_queue.push( { waiting.top()->burstCompletionTime(), &OpSys::complete_io_srt, 3 } );
     }
 
     /* Check for incoming processes. */
     if (!unarrived.empty())
     {
-      action_queue.push( {unarrived.top()->arrival_time, &OpSys::process_arrive_srt } );
+      action_queue.push( {unarrived.top()->arrival_time, &OpSys::process_arrive_srt, 4 } );
     }
 
     this->time = action_queue.top().time;
