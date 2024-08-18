@@ -5,7 +5,7 @@
 #include <vector>
 #include <queue>
 #include <unordered_set>
-using namespace std;
+#include <cmath>
 
 struct Process
 {

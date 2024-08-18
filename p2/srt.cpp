@@ -31,7 +31,7 @@ void OpSys::switch_out_cpu_srt( unsigned int current_time )
   Process* p = running;
   running = NULL;
   int old_tau = p->getTau();
-  p->update();
+  p->update(current_time);
   int bursts_left = p->getCpuBurstsLeft();
   if (bursts_left == 0)
   {
@@ -59,7 +59,7 @@ void OpSys::complete_io_srt( unsigned int current_time )
 {
   Process* p = waiting.top();
   waiting.pop();
-  p->update();
+  p->update(current_time);
   ready_srt.push(p);
   if (!TRUNCATE || current_time<TRUNC_TIME)
   {
@@ -117,5 +117,12 @@ void OpSys::shortest_remaining_time()
     (this->*(action_queue.top().func))(this->time);
 
   }
-  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for SRT [Q empty]\n";    
+  time += t_cs/2;
+  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for SRT [Q empty]\n";   
+  
+  // std::ofstream simout;
+  // simout.open("simout.txt", std::ios_base::app);
+  // simout << "Algorithm SRT\n";
+  // stats(simout);
+  // simout << "\n";
 }
