@@ -35,7 +35,7 @@ public:
 
   int getT() { return t; };
   int getTau() { return tau; };
-  int getCpuBurstsLeft() { return std::ceil( (num_total_bursts - burst_index ) / 2 ); };
+  int getCpuBurstsLeft() { return std::ceil( (num_total_bursts - burst_index ) / 2.0 ); };
   int getTotalCpuTime();
 
   int waitBurst(int current_time) { return burst_completion_time = current_time + time_remaining; };

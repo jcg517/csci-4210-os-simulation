@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
     alpha = atof(*(argv+7));
     tslice = atoi(*(argv+8));
 
-    if (n <= 0)
+    if (n <= 0 || n > 260)
     {
         std::cerr << "ERROR: Invalid process simulation count\n";
         exit(1);

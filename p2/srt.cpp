@@ -10,15 +10,6 @@ void OpSys::process_arrive_srt( int current_time )
   Process* p = unarrived.top();
   unarrived.pop();
   ready_srt.push(p);
-  //if (running != NULL)
-  //{
-  //  running->preempt(current_time - running->last_cpu_burst_start);
-  //  if (should_preempt(running, p))
-  //  {
-  //    ready_srt.push(running);
-  //    running = NULL;
-  //  }
-  //} 
   if (!TRUNCATE || current_time<TRUNC_TIME)
   {
     std::cout << "time " << current_time << "ms: Process " << p->id << " (tau " << p->getTau() << "ms) arrived; added to ready queue ";
@@ -176,7 +167,7 @@ void OpSys::shortest_remaining_time()
       action_queue.push( { running->burstCompletionTime(), &OpSys::switch_out_cpu_srt, 1 } );
       if (!ready_srt.empty() && should_preempt(this->time, running, ready_srt.top()))
       {
-        action_queue.push( { this->time, &OpSys::preempt_now_srt, 0 } );
+        action_queue.push( { this->time, &OpSys::preempt_now_srt, -1 } );
       }
     }
 

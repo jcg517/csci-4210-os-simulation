@@ -18,6 +18,11 @@ class CompArrivalTime
 public:
   bool operator() (Process* a, Process* b)
   {
+    if (a->arrival_time == b->arrival_time)
+    {
+      return std::strcmp(a->id, b->id) > 0;
+    }
+
     return a->arrival_time > b->arrival_time;
   }
 };
@@ -53,6 +58,11 @@ class CompBurstCompletionTime
 public:
   bool operator() (Process* a, Process* b)
   {
+    if (a->burstCompletionTime() == b->burstCompletionTime())
+    {
+      return std::strcmp(a->id, b->id) > 0;
+    }
+
     return a->burstCompletionTime() > b->burstCompletionTime();
   }
 };
