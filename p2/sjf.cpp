@@ -30,7 +30,7 @@ void OpSys::switch_out_cpu_sjf( unsigned int current_time )
   Process* p = running;
   running = NULL;
   int old_tau = p->getTau();
-  p->update();
+  p->update(current_time);
   int bursts_left = p->getCpuBurstsLeft();
   if (bursts_left == 0)
   {
@@ -60,7 +60,7 @@ void OpSys::complete_io_sjf( unsigned int current_time )
 {
   Process* p = waiting.top();
   waiting.pop();
-  p->update();
+  p->update(current_time);
   ready_sjf.push(p);
   if (!TRUNCATE || current_time<TRUNC_TIME)
   {
@@ -124,5 +124,12 @@ void OpSys::shortest_job_first()
     (this->*(action_queue.top().func))(this->time);
 
   }
-  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for SJF [Q empty]\n";    
+  time += t_cs/2;
+  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for SJF [Q empty]\n";
+
+  std::ofstream simout;
+  simout.open("simout.txt", std::ios_base::app);
+  simout << "Algorithm SJF\n";
+  stats(simout);
+  simout << "\n";  
 }

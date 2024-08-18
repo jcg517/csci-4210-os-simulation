@@ -132,18 +132,20 @@ int main(int argc, char* argv[])
         p->num_total_bursts = num_total;
         p->burst_times = burst_times;
         p->arrival_time = p_arrival_time;
+        p->start_turnaround = p_arrival_time;
         p->time_remaining = p->t;
+        p->total_cpu_time = p->t;
         p->tau_remaining = p->tau;
 
         processes.push_back(p);
     }  
 
-    // float cpu_cpu_avg = num_cpu_cpu != 0 ? (cpu_cpu_total / num_cpu_cpu) : 0;
-    // float cpu_io_avg = num_cpu_io != 0 ? (cpu_io_total / num_cpu_io) : 0;
-    // float cpu_avg = (num_cpu_cpu + num_io_cpu) != 0 ? std::ceil(1000 * (cpu_cpu_total + io_cpu_total) / (num_cpu_cpu + num_io_cpu)) / 1000 : 0;
-    // float io_cpu_avg = num_io_cpu != 0 ? (io_cpu_total / num_io_cpu) : 0;
-    // float io_io_avg = num_io_io != 0 ? (io_io_total / num_io_io) : 0;
-    // float io_avg = (num_cpu_io + num_io_io) != 0 ? std::ceil(1000 * (cpu_io_total + io_io_total) / (num_cpu_io + num_io_io)) / 1000 : 0;
+    float cpu_cpu_avg = num_cpu_cpu != 0 ? (cpu_cpu_total / num_cpu_cpu) : 0;
+    float cpu_io_avg = num_cpu_io != 0 ? (cpu_io_total / num_cpu_io) : 0;
+    float cpu_avg = (num_cpu_cpu + num_io_cpu) != 0 ? std::ceil(1000 * (cpu_cpu_total + io_cpu_total) / (num_cpu_cpu + num_io_cpu)) / 1000 : 0;
+    float io_cpu_avg = num_io_cpu != 0 ? (io_cpu_total / num_io_cpu) : 0;
+    float io_io_avg = num_io_io != 0 ? (io_io_total / num_io_io) : 0;
+    float io_avg = (num_cpu_io + num_io_io) != 0 ? std::ceil(1000 * (cpu_io_total + io_io_total) / (num_cpu_io + num_io_io)) / 1000 : 0;
 
     for (Process* p : processes)
     {
@@ -162,24 +164,24 @@ int main(int argc, char* argv[])
         // std::cout << "\n";
     }
 
-    // ofstream simout;
-    // simout.open("simout.txt");
-    // simout << "-- number of processes: " << n << "\n";
-    // simout << "-- number of CPU-bound processes: " << n_cpu << "\n";
-    // simout << "-- number of I/O-bound processes: " << (n - n_cpu) << "\n";
-    // simout << "-- CPU-bound average CPU burst time: " 
-    //        << std::fixed << std::setprecision(3) << std::ceil(1000 * cpu_cpu_avg) / 1000 << " ms\n";
-    // simout << "-- I/O-bound average CPU burst time: " 
-    //        << std::fixed << std::setprecision(3) << std::ceil(1000 * io_cpu_avg) / 1000 << " ms\n";
-    // simout << "-- overall average CPU burst time: " 
-    //        << std::fixed << std::setprecision(3) << cpu_avg << " ms\n";
-    // simout << "-- CPU-bound average I/O burst time: " 
-    //        << std::fixed << std::setprecision(3) << std::ceil(1000 * cpu_io_avg) / 1000 << " ms\n";
-    // simout << "-- I/O-bound average I/O burst time: " 
-    //        << std::fixed << std::setprecision(3) << std::ceil(1000 * io_io_avg) / 1000 << " ms\n";
-    // simout << "-- overall average I/O burst time: " 
-    //        << std::fixed << std::setprecision(3) << io_avg << " ms\n";
-    // simout.close();
+    std::ofstream simout;
+    simout.open("simout.txt");
+    simout << "-- number of processes: " << n << "\n";
+    simout << "-- number of CPU-bound processes: " << n_cpu << "\n";
+    simout << "-- number of I/O-bound processes: " << (n - n_cpu) << "\n";
+    simout << "-- CPU-bound average CPU burst time: " 
+           << std::fixed << std::setprecision(3) << std::ceil(1000 * cpu_cpu_avg) / 1000 << " ms\n";
+    simout << "-- I/O-bound average CPU burst time: " 
+           << std::fixed << std::setprecision(3) << std::ceil(1000 * io_cpu_avg) / 1000 << " ms\n";
+    simout << "-- overall average CPU burst time: " 
+           << std::fixed << std::setprecision(3) << cpu_avg << " ms\n";
+    simout << "-- CPU-bound average I/O burst time: " 
+           << std::fixed << std::setprecision(3) << std::ceil(1000 * cpu_io_avg) / 1000 << " ms\n";
+    simout << "-- I/O-bound average I/O burst time: " 
+           << std::fixed << std::setprecision(3) << std::ceil(1000 * io_io_avg) / 1000 << " ms\n";
+    simout << "-- overall average I/O burst time: " 
+           << std::fixed << std::setprecision(3) << io_avg << " ms\n\n";
+    simout.close();
 
     /* Initialize P2 Simulation */
     std::cout << "\n<<< PROJECT PART II\n<<< -- t_cs=" << tcs << "ms; alpha=" << std::fixed << std::setprecision(2) << alpha << "; t_slice=" << tslice << "ms\n";

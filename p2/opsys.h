@@ -2,6 +2,8 @@
 #define __OPSYS_H__
 
 #include <iostream>
+#include <iomanip>
+#include <fstream>
 #include <vector>
 #include <queue>
 #include <unordered_set>
@@ -88,6 +90,7 @@ public:
   std::priority_queue<Process*, std::vector<Process*>, CompBurstCompletionTime> waiting;
   std::priority_queue<Process*, std::vector<Process*>, CompArrivalTime> unarrived;
   std::unordered_set<Process*> unfinished;
+  std::vector<Process*> finished;
   unsigned int time = 0;
   int t_cs;
   int tslice;
@@ -128,6 +131,12 @@ public:
   void start_switch_in_rr(unsigned int current_time);
   void finish_preempt_switch_out_rr(unsigned int current_time);
   void round_robin();
+
+  /* Statistics */
+  void stats(std::ofstream& simout);
+  void stats_rr(std::ofstream& simout);
+
+
 };
 
 struct Action

@@ -37,7 +37,7 @@ void OpSys::switch_out_cpu_rr( unsigned int current_time )
   Process* p = running;
   running = NULL;
   p->time_remaining = 0;
-  p->update();
+  p->update(current_time);
   int bursts_left = p->getCpuBurstsLeft();
   if (bursts_left == 0)
   {
@@ -65,7 +65,7 @@ void OpSys::complete_io_rr( unsigned int current_time )
 {
   Process* p = waiting.top();
   waiting.pop();
-  p->update();
+  p->update(current_time);
   ready_rr.push(p);
   if (!TRUNCATE || current_time<TRUNC_TIME)
   {
@@ -172,6 +172,13 @@ void OpSys::round_robin()
     this->time = action_queue.top().time;
     (this->*(action_queue.top().func))(this->time);
   }
-
+  time += t_cs/2;
   std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for RR [Q empty]\n";    
+  
+  std::ofstream simout;
+  simout.open("simout.txt", std::ios_base::app);
+  simout << "Algorithm RR\n";
+  stats(simout);
+  stats_rr(simout);
+  simout << "\n";
 }

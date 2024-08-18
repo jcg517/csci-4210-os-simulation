@@ -29,11 +29,12 @@ void OpSys::switch_out_cpu_fcfs( unsigned int current_time )
 {
   Process* p = running;
   running = NULL;
-  p->update();
+  p->update(current_time);
   int bursts_left = p->getCpuBurstsLeft();
   if (bursts_left == 0)
   {
     std::cout << "time " << current_time << "ms: Process " << p->id << " terminated ";
+    finished.push_back(p);
     unfinished.erase(p);
     print_queue(ready_fcfs);
   } else
@@ -57,7 +58,7 @@ void OpSys::complete_io_fcfs( unsigned int current_time )
 {
   Process* p = waiting.top();
   waiting.pop();
-  p->update();
+  p->update(current_time);
   ready_fcfs.push(p);
   if (!TRUNCATE || current_time<TRUNC_TIME)
   {
@@ -121,5 +122,12 @@ void OpSys::first_come_first_served()
     (this->*(action_queue.top().func))(this->time);
 
   }
-  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for FCFS [Q empty]\n";    
+  time += t_cs/2;
+  std::cout << "time " << (this->time) << "ms: Simulator ended for FCFS [Q empty]\n";    
+  
+  std::ofstream simout;
+  simout.open("simout.txt", std::ios_base::app);
+  simout << "Algorithm FCFS\n";
+  stats(simout);
+  simout << "\n";
 }
