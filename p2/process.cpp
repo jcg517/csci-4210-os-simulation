@@ -43,6 +43,7 @@ void Process::reset()
 	this->prev_tau = tau;
 	this->time_remaining = t;
   this->tau_remaining = tau;
+  this->last_cpu_burst_start = 0;
 	this->num_switches = 1;
   this->num_preempts = 0;
 	this->total_cpu_time = t;

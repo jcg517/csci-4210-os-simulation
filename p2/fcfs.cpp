@@ -77,6 +77,9 @@ void OpSys::start_switch_in_fcfs( int current_time)
 
 void OpSys::first_come_first_served()
 {
+  switching_to_run = NULL;
+  switching_to_io = NULL;
+  switching_to_ready = NULL;
   this->time = 0;
   std::cout << "time " << this->time << "ms: Simulator started for FCFS [Q empty]\n";
   while (!this->unfinished.empty())
@@ -94,10 +97,10 @@ void OpSys::first_come_first_served()
     {
       if (switching_to_run == NULL)
       {
-        if (!ready_fcfs.empty()) action_queue.push( { this->time+t_cs/2, &OpSys::start_switch_in_fcfs, 0 } );
+        if (switching_to_io == NULL && !ready_fcfs.empty()) action_queue.push( { this->time, &OpSys::start_switch_in_fcfs, 10 } );
       } else
       {
-        action_queue.push( { switching_to_run->last_switch_time, &OpSys::start_cpu_use_fcfs, 2 } );
+        action_queue.push( { switching_to_run->last_switch_time+t_cs/2, &OpSys::start_cpu_use_fcfs, 2 } );
       }
     } else
     

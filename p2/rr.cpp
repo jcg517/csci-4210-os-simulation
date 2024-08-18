@@ -116,6 +116,9 @@ void OpSys::finish_preempt_switch_out_rr(int current_time)
 
 void OpSys::round_robin()
 {
+  switching_to_run = NULL;
+  switching_to_io = NULL;
+  switching_to_ready = NULL;
   this->time = 0;
   std::cout << "time " << this->time << "ms: Simulator started for RR [Q empty]\n";
   while (!this->unfinished.empty())
@@ -138,10 +141,10 @@ void OpSys::round_robin()
       {
         if (switching_to_run == NULL)
         {
-          if (!ready_rr.empty()) action_queue.push( { this->time+t_cs/2, &OpSys::start_switch_in_rr, 0 } );
+          if (switching_to_io == NULL && !ready_rr.empty()) action_queue.push( { this->time, &OpSys::start_switch_in_rr, 10 } );
         } else
         {
-          action_queue.push( { switching_to_run->last_switch_time, &OpSys::start_cpu_use_rr, 2 } );
+          action_queue.push( { switching_to_run->last_switch_time+t_cs/2, &OpSys::start_cpu_use_rr, 2 } );
         }
       }
     } else
@@ -180,5 +183,5 @@ void OpSys::round_robin()
   simout << "Algorithm RR\n";
   stats(simout);
   stats_rr(simout);
-  simout << "\n";
+  //simout << "\n";
 }

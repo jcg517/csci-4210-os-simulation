@@ -64,8 +64,8 @@ void OpSys::stats(std::ofstream& simout)
   simout << "-- I/O-bound average wait time: " << std::setprecision(3) << avg_wait_io << " ms\n";
   simout << "-- overall average wait time: " << std::setprecision(3) << avg_wait << " ms\n";  
 
-  simout <<"-- CPU-bound average turnaround time:  " << std::setprecision(3) << avg_cpu_turn << " ms\n";
-  simout <<"-- I/O-bound average turnaround time:  " << std::setprecision(3) << avg_io_turn << " ms\n";
+  simout <<"-- CPU-bound average turnaround time: " << std::setprecision(3) << avg_cpu_turn << " ms\n";
+  simout <<"-- I/O-bound average turnaround time: " << std::setprecision(3) << avg_io_turn << " ms\n";
   simout <<"-- overall average turnaround time: " << avg_turn << " ms\n";
 
   simout << "-- CPU-bound number of context switches: " << switches_cpu << "\n";

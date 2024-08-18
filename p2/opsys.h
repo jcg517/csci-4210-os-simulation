@@ -10,7 +10,7 @@
 #include <cstring>
 #include "process.h"
 
-#define TRUNCATE false 
+#define TRUNCATE true 
 #define TRUNC_TIME 10000
 
 class CompArrivalTime
@@ -120,6 +120,7 @@ public:
   void start_cpu_use_srt(int current_time);
   void start_switch_in_srt(int current_time);
   void finish_preempt_switch_out_srt(int current_time);
+  void preempt_now_srt(int current_time);
   void shortest_remaining_time();
   
   /* RR */

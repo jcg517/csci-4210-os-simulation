@@ -79,6 +79,9 @@ void OpSys::start_switch_in_sjf(int current_time)
 
 void OpSys::shortest_job_first()
 {
+  switching_to_run = NULL;
+  switching_to_io = NULL;
+  switching_to_ready = NULL;
   this->time = 0;
   std::cout << "time " << this->time << "ms: Simulator started for SJF [Q empty]\n";
   while (!this->unfinished.empty())
@@ -96,10 +99,10 @@ void OpSys::shortest_job_first()
     {
       if (switching_to_run == NULL)
       {
-        if (!ready_sjf.empty()) action_queue.push( { this->time+t_cs/2, &OpSys::start_switch_in_sjf, 0 } );
+        if (switching_to_io == NULL && !ready_sjf.empty()) action_queue.push( { this->time, &OpSys::start_switch_in_sjf, 10 } );
       } else
       {
-        action_queue.push( { switching_to_run->last_switch_time, &OpSys::start_cpu_use_sjf, 2 } );
+        action_queue.push( { switching_to_run->last_switch_time+t_cs/2, &OpSys::start_cpu_use_sjf, 2 } );
       }
     } else
     
