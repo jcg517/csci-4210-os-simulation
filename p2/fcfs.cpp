@@ -1,6 +1,6 @@
 #include "opsys.h"
 
-void OpSys::process_arrive_fcfs( unsigned int current_time )
+void OpSys::process_arrive_fcfs( int current_time )
 {
   Process* p = unarrived.top();
   unarrived.pop();
@@ -12,7 +12,7 @@ void OpSys::process_arrive_fcfs( unsigned int current_time )
   }
 }
 
-void OpSys::start_cpu_use_fcfs( unsigned int current_time )
+void OpSys::start_cpu_use_fcfs( int current_time )
 {
   Process* p = switching_to_run;
   this->switching_to_run = NULL;
@@ -25,7 +25,7 @@ void OpSys::start_cpu_use_fcfs( unsigned int current_time )
   }
 }
 
-void OpSys::switch_out_cpu_fcfs( unsigned int current_time )
+void OpSys::switch_out_cpu_fcfs( int current_time )
 {
   Process* p = running;
   running = NULL;
@@ -54,7 +54,7 @@ void OpSys::switch_out_cpu_fcfs( unsigned int current_time )
   p->last_switch_time = current_time;
 }
 
-void OpSys::complete_io_fcfs( unsigned int current_time )
+void OpSys::complete_io_fcfs( int current_time )
 {
   Process* p = waiting.top();
   waiting.pop();
@@ -68,7 +68,7 @@ void OpSys::complete_io_fcfs( unsigned int current_time )
   p->finishBurst();
 }
 
-void OpSys::start_switch_in_fcfs(unsigned int current_time)
+void OpSys::start_switch_in_fcfs( int current_time)
 {
   switching_to_run = ready_fcfs.front();
   ready_fcfs.pop();

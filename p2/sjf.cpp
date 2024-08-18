@@ -1,6 +1,6 @@
 #include "opsys.h"
 
-void OpSys::process_arrive_sjf( unsigned int current_time )
+void OpSys::process_arrive_sjf( int current_time )
 {
   Process* p = unarrived.top();
   unarrived.pop();
@@ -12,7 +12,7 @@ void OpSys::process_arrive_sjf( unsigned int current_time )
   }
 }
 
-void OpSys::start_cpu_use_sjf( unsigned int current_time )
+void OpSys::start_cpu_use_sjf( int current_time )
 {
   Process* p = switching_to_run;
   this->switching_to_run = NULL;
@@ -25,7 +25,7 @@ void OpSys::start_cpu_use_sjf( unsigned int current_time )
   }
 }
 
-void OpSys::switch_out_cpu_sjf( unsigned int current_time )
+void OpSys::switch_out_cpu_sjf( int current_time )
 {
   Process* p = running;
   running = NULL;
@@ -56,7 +56,7 @@ void OpSys::switch_out_cpu_sjf( unsigned int current_time )
   p->last_switch_time = current_time;
 }
 
-void OpSys::complete_io_sjf( unsigned int current_time )
+void OpSys::complete_io_sjf( int current_time )
 {
   Process* p = waiting.top();
   waiting.pop();
@@ -70,7 +70,7 @@ void OpSys::complete_io_sjf( unsigned int current_time )
   p->finishBurst();
 }
 
-void OpSys::start_switch_in_sjf(unsigned int current_time)
+void OpSys::start_switch_in_sjf(int current_time)
 {
   switching_to_run = ready_sjf.top();
   ready_sjf.pop();
@@ -125,7 +125,7 @@ void OpSys::shortest_job_first()
 
   }
   time += t_cs/2;
-  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for SJF [Q empty]\n";
+  std::cout << "time " << (this->time) << "ms: Simulator ended for SJF [Q empty]\n";
 
   std::ofstream simout;
   simout.open("simout.txt", std::ios_base::app);

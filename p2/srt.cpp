@@ -5,7 +5,7 @@ bool should_preempt(Process* cur, Process* top )
   return cur->tau_remaining > top->tau_remaining;
 }
 
-void OpSys::process_arrive_srt( unsigned int current_time )
+void OpSys::process_arrive_srt( int current_time )
 {
   Process* p = unarrived.top();
   unarrived.pop();
@@ -26,7 +26,7 @@ void OpSys::process_arrive_srt( unsigned int current_time )
   }
 }
 
-void OpSys::start_cpu_use_srt( unsigned int current_time )
+void OpSys::start_cpu_use_srt( int current_time )
 {
   Process* p = switching_to_run;
   this->switching_to_run = NULL;
@@ -46,7 +46,7 @@ void OpSys::start_cpu_use_srt( unsigned int current_time )
   }
 }
 
-void OpSys::switch_out_cpu_srt( unsigned int current_time )
+void OpSys::switch_out_cpu_srt( int current_time )
 {
   Process* p = running;
   running = NULL;
@@ -77,7 +77,7 @@ void OpSys::switch_out_cpu_srt( unsigned int current_time )
   p->last_switch_time = current_time;
 }
 
-void OpSys::complete_io_srt( unsigned int current_time )
+void OpSys::complete_io_srt( int current_time )
 {
   Process* p = waiting.top();
   waiting.pop();
@@ -108,14 +108,14 @@ void OpSys::complete_io_srt( unsigned int current_time )
   p->finishBurst();
 }
 
-void OpSys::start_switch_in_srt(unsigned int current_time)
+void OpSys::start_switch_in_srt(int current_time)
 {
   switching_to_run = ready_srt.top();
   ready_srt.pop();
   switching_to_run->last_switch_time = current_time;
 }
 
-void OpSys::finish_preempt_switch_out_srt(unsigned int current_time)
+void OpSys::finish_preempt_switch_out_srt(int current_time)
 {
   ready_srt.push(switching_to_ready);
   switching_to_ready = NULL;
@@ -176,7 +176,7 @@ void OpSys::shortest_remaining_time()
 
   }
   time += t_cs/2;
-  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for SRT [Q empty]\n";   
+  std::cout << "time " << (this->time) << "ms: Simulator ended for SRT [Q empty]\n";   
   
   // std::ofstream simout;
   // simout.open("simout.txt", std::ios_base::app);

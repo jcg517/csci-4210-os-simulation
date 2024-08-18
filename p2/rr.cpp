@@ -1,6 +1,6 @@
 #include "opsys.h"
 
-void OpSys::process_arrive_rr( unsigned int current_time )
+void OpSys::process_arrive_rr( int current_time )
 {
   Process* p = unarrived.top();
   unarrived.pop();
@@ -12,7 +12,7 @@ void OpSys::process_arrive_rr( unsigned int current_time )
   }
 }
 
-void OpSys::start_cpu_use_rr( unsigned int current_time )
+void OpSys::start_cpu_use_rr( int current_time )
 {
   Process* p = switching_to_run;
   this->switching_to_run = NULL;
@@ -32,7 +32,7 @@ void OpSys::start_cpu_use_rr( unsigned int current_time )
   }
 }
 
-void OpSys::switch_out_cpu_rr( unsigned int current_time )
+void OpSys::switch_out_cpu_rr( int current_time )
 {
   Process* p = running;
   running = NULL;
@@ -61,7 +61,7 @@ void OpSys::switch_out_cpu_rr( unsigned int current_time )
   p->last_switch_time = current_time;
 }
 
-void OpSys::complete_io_rr( unsigned int current_time )
+void OpSys::complete_io_rr( int current_time )
 {
   Process* p = waiting.top();
   waiting.pop();
@@ -76,7 +76,7 @@ void OpSys::complete_io_rr( unsigned int current_time )
 }
 
 
-void OpSys::ts_expiration_rr(unsigned int current_time)
+void OpSys::ts_expiration_rr( int current_time)
 {
 	Process* p = running;
 	/* If ready queue is empty, there is no preemption */
@@ -100,14 +100,14 @@ void OpSys::ts_expiration_rr(unsigned int current_time)
   p->last_switch_time = current_time;
 }
 
-void OpSys::start_switch_in_rr(unsigned int current_time)
+void OpSys::start_switch_in_rr(int current_time)
 {
   switching_to_run = ready_rr.front();
   ready_rr.pop();
   switching_to_run->last_switch_time = current_time;
 }
 
-void OpSys::finish_preempt_switch_out_rr(unsigned int current_time)
+void OpSys::finish_preempt_switch_out_rr(int current_time)
 {
   ready_rr.push(switching_to_ready);
   switching_to_ready = NULL;
@@ -122,12 +122,12 @@ void OpSys::round_robin()
   {
     /* Search for next 'interesting' event. */
     std::priority_queue<Action, std::vector<Action>, CompAction> action_queue;
- 
+
     if (switching_to_io != NULL)
     {
       action_queue.push( { switching_to_io->last_switch_time+t_cs/2, &OpSys::finish_io_switch_out, 0 } );
-    }
-
+    } 
+ 
     /* See if CPU isn't doing anything. */
     if (running == NULL)
     {
@@ -173,7 +173,7 @@ void OpSys::round_robin()
     (this->*(action_queue.top().func))(this->time);
   }
   time += t_cs/2;
-  std::cout << "time " << (this->time+t_cs/2) << "ms: Simulator ended for RR [Q empty]\n";    
+  std::cout << "time " << (this->time) << "ms: Simulator ended for RR [Q empty]\n";    
   
   std::ofstream simout;
   simout.open("simout.txt", std::ios_base::app);

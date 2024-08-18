@@ -90,12 +90,12 @@ int main(int argc, char* argv[])
         int num_cpu = std::ceil(drand48() * 32);      // # CPU bursts
         int num_io = num_cpu - 1;
         int num_total = num_cpu + num_io;
-        unsigned int* burst_times = new unsigned int[num_total];
+        int* burst_times = new int[num_total];
 
         // fill combined burst times list
         for (int j = 0; j < num_total; j++)
         {
-            unsigned int x = std::ceil(nextExp());
+            int x = std::ceil(nextExp());
 
             if (is_cpu_bound)
             {

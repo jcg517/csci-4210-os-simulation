@@ -91,45 +91,45 @@ public:
   std::priority_queue<Process*, std::vector<Process*>, CompArrivalTime> unarrived;
   std::unordered_set<Process*> unfinished;
   std::vector<Process*> finished;
-  unsigned int time = 0;
+  int time = 0;
   int t_cs;
   int tslice;
   
-  void finish_io_switch_out(unsigned int current_time) { switching_to_io = NULL; if (current_time == 0) return; };
+  void finish_io_switch_out(int current_time) { switching_to_io = NULL; if (current_time == 0) return; };
   
   /* FCFS */
-  void process_arrive_fcfs(unsigned int current_time);
-  void switch_out_cpu_fcfs(unsigned int current_time);
-  void complete_io_fcfs(unsigned int current_time);
-  void start_cpu_use_fcfs(unsigned int current_time);
-  void start_switch_in_fcfs(unsigned int current_time);
+  void process_arrive_fcfs(int current_time);
+  void switch_out_cpu_fcfs(int current_time);
+  void complete_io_fcfs(int current_time);
+  void start_cpu_use_fcfs(int current_time);
+  void start_switch_in_fcfs(int current_time);
   void first_come_first_served();
   
   /* SJF */
-  void process_arrive_sjf(unsigned int current_time);
-  void switch_out_cpu_sjf(unsigned int current_time);
-  void complete_io_sjf(unsigned int current_time);
-  void start_cpu_use_sjf(unsigned int current_time);
-  void start_switch_in_sjf(unsigned int current_time);
+  void process_arrive_sjf(int current_time);
+  void switch_out_cpu_sjf(int current_time);
+  void complete_io_sjf(int current_time);
+  void start_cpu_use_sjf(int current_time);
+  void start_switch_in_sjf(int current_time);
   void shortest_job_first();
   
   /* SRT */
-  void process_arrive_srt(unsigned int current_time);
-  void switch_out_cpu_srt(unsigned int current_time);
-  void complete_io_srt(unsigned int current_time);
-  void start_cpu_use_srt(unsigned int current_time);
-  void start_switch_in_srt(unsigned int current_time);
-  void finish_preempt_switch_out_srt(unsigned int current_time);
+  void process_arrive_srt(int current_time);
+  void switch_out_cpu_srt(int current_time);
+  void complete_io_srt(int current_time);
+  void start_cpu_use_srt(int current_time);
+  void start_switch_in_srt(int current_time);
+  void finish_preempt_switch_out_srt(int current_time);
   void shortest_remaining_time();
   
   /* RR */
-  void process_arrive_rr(unsigned int current_time);
-  void switch_out_cpu_rr(unsigned int current_time);
-  void complete_io_rr(unsigned int current_time);
-  void start_cpu_use_rr(unsigned int current_time);
-  void ts_expiration_rr(unsigned int current_time);
-  void start_switch_in_rr(unsigned int current_time);
-  void finish_preempt_switch_out_rr(unsigned int current_time);
+  void process_arrive_rr(int current_time);
+  void switch_out_cpu_rr(int current_time);
+  void complete_io_rr(int current_time);
+  void start_cpu_use_rr(int current_time);
+  void ts_expiration_rr(int current_time);
+  void start_switch_in_rr(int current_time);
+  void finish_preempt_switch_out_rr(int current_time);
   void round_robin();
 
   /* Statistics */
@@ -141,8 +141,8 @@ public:
 
 struct Action
 {
-  unsigned int time;
-  void (OpSys::*func)(unsigned int);
+  int time;
+  void (OpSys::*func)(int);
   int priority;
 };
 

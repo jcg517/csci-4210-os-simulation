@@ -23,7 +23,7 @@ void Process::update( int current_time )
   }
 }
 
-void Process::preempt( unsigned int elapsed_time )
+void Process::preempt( int elapsed_time )
 {
 	this->num_preempts++;
 	this->num_switches++;	
